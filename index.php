@@ -185,7 +185,7 @@ if ( isset($_FILES["file"])) {
                     }
                 }
             }
-            $csv_filename = "LTBATCH_".date("Y-m-d_H-i",time()).".csv";
+            $csv_filename = "LTBATCH_".date("Y-m-d_H-i-s",time()).".csv";
             $fd = fopen ($csv_filename, "w");
             fwrite($fd,$csv_data);
             fclose($fd);
