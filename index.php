@@ -6,16 +6,22 @@
         <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" enctype="multipart/form-data">
         
         <tr>
-        <td width="20%">Select file</td>
-        <td width="80%"><input type="file" name="file" id="file" /></td>
+            <td width="30%">Select file</td>
+            <td width="70%"><input type="file" name="file" id="file" /></td>
+        </tr>
+
+        <tr>
+            <td width="30%">Collection Name</td>
+            <td width="70%"><input type="text" name="collection_name" id="collection_name" /><br /><span style="font-size:15px">Input the abbreviation of the collection name.(e.g. LTP)</span></td>
+        </tr>
+
+        <tr>
+            <td width="30%">parent_object</td>
+            <td width="70%"><input type="text" name="parent_object" id="parent_object" /></td>
         </tr>
         <tr>
-        <td width="20%">parent_object</td>
-        <td width="80%"><input type="text" name="parent_object" id="parent_object" /></td>
-        </tr>
-        <tr>
-        <td width="20%">parent_predicate</td>
-            <td width="80%">
+        <td width="30%">parent_predicate</td>
+            <td width="70%">
             <select id="parent_predicate" name="parent_predicate">
                 <option value="isMemberOfCollection">isMemberOfCollection</option>
                 <option value="isConstituentOf">isConstituentOf</option>
@@ -24,8 +30,8 @@
             </td>
         </tr>
         <tr>
-            <td width="20%">cmodel</td>
-            <td width="80%">
+            <td width="30%">cmodel</td>
+            <td width="70%">
                 <select id="cmodel" name="cmodel">
                     <option value="islandora:sp_basic_image">islandora:sp_basic_image</option>
                     <option value="islandora:sp_pdf">islandora:sp_pdf</option>
@@ -40,16 +46,16 @@
             </td>
         </tr>
         <tr>
-            <td width="20%">typeOfResource</td>
-            <td width="80%">
+            <td width="30%">typeOfResource</td>
+            <td width="70%">
                 <select id="typeOfResource" name="typeOfResource">
-                    <option value="text">text</option>
+                    <option value="still image">still image</option>
                     <option value="cartographic">cartographic</option>
                     <option value="notated music">notated music</option>
                     <option value="sound recording">sound recording</option>
                     <option value="sound recording-musical">sound recording-musical</option>
                     <option value="sound-recording-nonmusical">sound-recording-nonmusical</option>
-                    <option value="still image">still image</option>
+                    <option value="text">text</option>
                     <option value="moving image">moving image</option>
                     <option value="three dimensional object">three dimensional object</option>
                     <option value="software, multimedia">software, multimedia</option>
@@ -59,8 +65,8 @@
         </tr>
 
         <tr>
-        <td>Convert</td>
-        <td><input type="submit" name="submit" /></td>
+            <td>Convert</td>
+            <td><input type="submit" name="submit" /></td>
         </tr>
         
         </form>
@@ -119,6 +125,7 @@ if ( isset($_FILES["file"])) {
             // echo 'Country name: '.$csv[16][1].'<br />';
             // echo 'typeOfResource: '.$csv[19][2].'<br />';
             // echo 'subjects: '.$csv[20][2].'<br />';
+            $collection_name = $_POST['collection_name'];
             $parent_object = $_POST['parent_object'];
             $parent_predicate = $_POST['parent_predicate'];
             $cmodel = $_POST['cmodel'];
@@ -128,7 +135,7 @@ if ( isset($_FILES["file"])) {
             $geographic = trim($csv[16][1]);
             $access_condition = "Individuals requesting reproductions expressly assume the responsibility for compliance with all pertinent provisions of the Copyright Act, 17 U.S.C. ss101 et seq. Patrons further agree to indemnify and hold harmless the Marist College Archives & Special Collections and its staff in connection with any disputes arising from the Copyright Act, over the reproduction of material at the request of patrons. For more information please visit the following website: http://www.loc.gov/copyright/title17/.";
             $note_local = " ";
-            $finding_aids_url = "http://library.marist.edu/exploro/exploro/viewEAD/LTP/".$csv[22][1];
+            $finding_aids_url = "http://library.marist.edu/exploro/exploro/viewEAD/".trim($collection_name)."/".$csv[14][1];
             $abstract = " ";
             $rows = count($csv);
             for ($row = 0; $row < $rows; $row++) {
@@ -175,11 +182,11 @@ if ( isset($_FILES["file"])) {
                         if(($csv[$j][0] >= 1) && ($csv[$j][0] <= 9)){
                             // echo $box_num."-0".$csv[$j][0]."-".$csv[$j][1]."-".$csv[$j][2]."-".$csv[$j][6]."-".$csv[$j][7]."-".$box_num.$csv[$j][0]."jpg"."<br />";  
                             $csv[$j][1] = str_replace('"','""',$csv[$j][1]);
-                            $csv_data.=$box_num.'-0'.$csv[$j][0].',"'.$csv[$j][1].'","'.$csv[$j][1].'","'.$csv[$j][2].'","'.$csv[$j][6].'","'.$csv[$j][7].'","'.$box_num.$csv[$j][0].'.jpg","'.$parent_object.'","'.$parent_predicate.'","'.$cmodel.'","'.$names.'","'.$typeOfResource.'","'.$subjects.'","'.$geographic.'","'.$access_condition.'","'.$note_local.'","'.$finding_aids_url.'","'.$abstract.'"'."\n";
+                            $csv_data.=$box_num.'-0'.$csv[$j][0].',"'.$csv[$j][1].'","'.$csv[$j][1].'","'.$csv[$j][2].'","'.$csv[$j][6].'","'.$csv[$j][7].'","'.$box_num.".".$csv[$j][0].'.jpg","'.$parent_object.'","'.$parent_predicate.'","'.$cmodel.'","'.$names.'","'.$typeOfResource.'","'.$subjects.'","'.$geographic.'","'.$access_condition.'","'.$note_local.'","'.$finding_aids_url.'","'.$abstract.'"'."\n";
                         } else {
                             // echo $box_num."-".$csv[$j][0]."-".$csv[$j][1]."-".$csv[$j][2].$csv[$j][6]."-".$csv[$j][7]."-".$box_num.".".$csv[$j][0]."jpg"."<br />"; 
                             $csv[$j][1] = str_replace('"','""',$csv[$j][1]);
-                            $csv_data.=$box_num.'-'.$csv[$j][0].',"'.$csv[$j][1].'","'.$csv[$j][1].'","'.$csv[$j][2].'","'.$csv[$j][6].'","'.$csv[$j][7].'","'.$box_num.$csv[$j][0].'.jpg","'.$parent_object.'","'.$parent_predicate.'","'.$cmodel.'","'.$names.'","'.$typeOfResource.'","'.$subjects.'","'.$geographic.'","'.$access_condition.'","'.$note_local.'","'.$finding_aids_url.'","'.$abstract.'"'."\n";
+                            $csv_data.=$box_num.'-'.$csv[$j][0].',"'.$csv[$j][1].'","'.$csv[$j][1].'","'.$csv[$j][2].'","'.$csv[$j][6].'","'.$csv[$j][7].'","'.$box_num.".".$csv[$j][0].'.jpg","'.$parent_object.'","'.$parent_predicate.'","'.$cmodel.'","'.$names.'","'.$typeOfResource.'","'.$subjects.'","'.$geographic.'","'.$access_condition.'","'.$note_local.'","'.$finding_aids_url.'","'.$abstract.'"'."\n";
                         }
                         
                     }
