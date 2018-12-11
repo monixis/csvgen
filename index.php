@@ -211,7 +211,7 @@ if ( isset($_POST["submit"]) ) {
                 reader.onload = function(event){
                     var csv = event.target.result;
                     var data = $.csv.toArrays(csv);
-                    console.log(data);
+                    // console.log(data);
                     var html = '';
                     var geo = (data[16][1]);
                     var title2 = (data[14][2]) ;
@@ -326,7 +326,7 @@ if ( isset($_POST["submit"]) ) {
                             <td width="60%">
                                 <select id="typeOfResource" name="typeOfResource">
                                     <option value="still image">still image</option>
-                                    <option value="cartographic">finding_aid</option>
+                                    <option value="finding_aid">finding_aid</option>
                                     <option value="cartographic">cartographic</option>
                                     <option value="notated music">notated music</option>
                                     <option value="sound recording">sound recording</option>
