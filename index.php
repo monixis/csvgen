@@ -30,16 +30,32 @@ if ( isset($_POST["submit"]) ) {
                 $collection_name = $_POST['collection_name'];
                 $parent_object = $_POST['parent_object'];
                 $parent_predicate = $_POST['parent_predicate'];
-                $cmodel = $_POST['cmodel'];
-                
+                $cmodel = $_POST['cmodel'];                
                 $typeOfResource = $_POST['typeOfResource'];
-                $subjects = trim($csv[20][2]);
+                 //$geographic = trim($csv[16][1]);  
+                $geographic = trim($csv[16][1]);
+                $title2 = trim($csv[14][2]);
+                if($geographic!=""){
+                    if($geographic === $title2){
+                        $title = " ";
+                    } 
+                }
                 if($_POST['select_column'] == 'names'){
-                    $names = trim($csv[16][1]);
+                    $names = $title2;
                     $geographic = " ";
-                } else {
+                    $subjects = " ";
+                } else if($_POST['select_column'] == 'geographic'){
                     $names = " ";
-                    $geographic = trim($csv[16][1]);
+                    $geographic = $title2;
+                    $subjects = " ";
+                } else if($_POST['select_column'] == 'none'){
+                    $geographic = " ";
+                    $names = " ";
+                    $subjects = " ";
+                } else if($_POST['select_column'] == 'subjects'){
+                    $geographic = " ";
+                    $names = " ";
+                    $subjects = $title2; 
                 }
                 $access_condition = "Individuals requesting reproductions expressly assume the responsibility for compliance with all pertinent provisions of the Copyright Act, 17 U.S.C. ss101 et seq. Patrons further agree to indemnify and hold harmless the Marist College Archives & Special Collections and its staff in connection with any disputes arising from the Copyright Act, over the reproduction of material at the request of patrons. For more information please visit the following website: http://www.loc.gov/copyright/title17/.";
                 $note_local = " ";
@@ -138,7 +154,103 @@ if ( isset($_POST["submit"]) ) {
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-        <script src="jquery.csv.js"></script>
+        <script src="http://evanplaice.github.io/jquery-csv/src/jquery.csv.min.js"></script>
+        <!script src="jquery.csv.js"></script>
+        <script>
+            $(document).ready(function() {
+            if(isAPIAvailable()) {
+                $('#file').bind('change', handleFileSelect);
+            }
+            });
+
+            function isAPIAvailable() {
+            // Check for the various File API support.
+            if (window.File && window.FileReader && window.FileList && window.Blob) {
+                // Great success! All the File APIs are supported.
+                return true;
+            } else {
+                // source: File API availability - http://caniuse.com/#feat=fileapi
+                // source: <output> availability - http://html5doctor.com/the-output-element/
+                document.writeln('The HTML5 APIs used in this form are only available in the following browsers:<br />');
+                // 6.0 File API & 13.0 <output>
+                document.writeln(' - Google Chrome: 13.0 or later<br />');
+                // 3.6 File API & 6.0 <output>
+                document.writeln(' - Mozilla Firefox: 6.0 or later<br />');
+                // 10.0 File API & 10.0 <output>
+                document.writeln(' - Internet Explorer: Not supported (partial support expected in 10.0)<br />');
+                // ? File API & 5.1 <output>
+                document.writeln(' - Safari: Not supported<br />');
+                // ? File API & 9.2 <output>
+                document.writeln(' - Opera: Not supported');
+                return false;
+            }
+            }
+
+            function handleFileSelect(evt) {
+            var files = evt.target.files; // FileList object
+            var file = files[0];
+
+            // read the file metadata
+            // var output = ''
+                // output += '<span style="font-weight:bold;">' + escape(file.name) + '</span><br />\n';
+                // output += ' - FileType: ' + (file.type || 'n/a') + '<br />\n';
+                // output += ' - FileSize: ' + file.size + ' bytes<br />\n';
+                // output += ' - LastModified: ' + (file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() : 'n/a') + '<br />\n';
+
+            // read the file contents
+            printTable(file);
+            
+
+            // post the results
+            // $('#list').append(output);
+            }
+
+            function printTable(file) {
+                var reader = new FileReader();
+                reader.readAsText(file);
+                reader.onload = function(event){
+                    var csv = event.target.result;
+                    var data = $.csv.toArrays(csv);
+                    console.log(data);
+                    var html = '';
+                    var geo = (data[16][1]);
+                    var title2 = (data[14][2]) ;
+                    // conditions covered
+                    // 1 - if geo has a value - we store it in geo column of csv to be converted
+                    // 2 - if geo is equal to title2(title[2]) then do not ask user the question to store the value
+                    // 3 - if title2 is different from geo then, ask user the question and add a dropdown category as geography.
+                    if((geo!="") && (title2!="")){
+                        if(geo == title2){
+                            //save info in geo column
+                            html += "";
+                        } else {
+                            html += title2;
+                        }
+                    } else if(title2!=""){
+                        if(geo != title2){
+                            html += title2;
+                        }
+                    }
+                    // html += data[14][2];
+                    if(!html){//if geo and title2 are same, hide the question
+                        document.getElementById("column_dropdown").style.display = 'none';
+                        document.getElementById("select_column").style.display = 'none';
+                        document.getElementById("contents").style.display = 'none';
+                        $("#select_column option[value='geographic']").remove();
+                    } else {//if geo and title2 are not  same, hide the question
+                        // html+= "<option value='geographic'>Geographic</option>";
+                        $("#select_column option[value='geographic']").remove();
+                        document.getElementById("column_dropdown").style.display = '';
+                        document.getElementById("select_column").style.display = '';
+                        document.getElementById("contents").style.display = '';
+                        $("#select_column").append(new Option("Geographic", "geographic"));
+                        // $('#select_column').add("<option value='geographic'>Geographic</option>");
+                        $('#contents').html(html);
+                    }
+                };
+                
+            }
+    </script>
     </head>
     <body>
         <div id="headerContainer">
@@ -156,7 +268,7 @@ if ( isset($_POST["submit"]) ) {
                         
                         <tr>
                             <td>Select file</td>
-                            <td><input type="file" name="file" id="file" /></td>
+                            <td><input type="file" name="file" id="file" multiple/></td>
                         </tr>
 
                         <tr>
@@ -165,14 +277,18 @@ if ( isset($_POST["submit"]) ) {
                             <span>Input the abbreviation of the collection name.(e.g. LTP)</span></td>
                         </tr>
 
-                        <tr>
+                        <tr id="column_dropdown">
                             <td width="40%">Selet the column for this information</td>
+                            <tr>
+                            <td id="contents" style="color:red;"></td>
                             <td>
                                 <select id="select_column" name="select_column">
                                     <option value="names">Names</option>
-                                    <option value="geographic">Geographic</option>
+                                    <option value="subjects">Subjects</option>
+                                    <option value="none" selected="selected">None</option>
                                 </select>
                             </td>
+                            </tr>
                         </tr>
 
                         <tr>
@@ -210,6 +326,7 @@ if ( isset($_POST["submit"]) ) {
                             <td width="60%">
                                 <select id="typeOfResource" name="typeOfResource">
                                     <option value="still image">still image</option>
+                                    <option value="cartographic">finding_aid</option>
                                     <option value="cartographic">cartographic</option>
                                     <option value="notated music">notated music</option>
                                     <option value="sound recording">sound recording</option>
@@ -234,6 +351,7 @@ if ( isset($_POST["submit"]) ) {
 
                         </form>
                     </table>
+                    
                 </div>
             </div>
         </div>
