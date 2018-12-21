@@ -34,7 +34,8 @@ if ( isset($_POST["submit"]) ) {
                 $typeOfResource = $_POST['typeOfResource'];
                  //$geographic = trim($csv[16][1]);  
                 $geographic = trim($csv[16][1]);
-                $title2 = trim($csv[14][2]);
+                //$title2 = trim($csv[14][2]);
+                $title2 = $_POST['keyword'];
                 if($geographic!=""){
                     if($geographic === $title2){
                         $title = " ";
@@ -235,17 +236,18 @@ if ( isset($_POST["submit"]) ) {
                     if(!html){//if geo and title2 are same, hide the question
                         document.getElementById("column_dropdown").style.display = 'none';
                         document.getElementById("select_column").style.display = 'none';
-                        document.getElementById("contents").style.display = 'none';
+                        document.getElementById("keyword").style.display = 'none';
                         $("#select_column option[value='geographic']").remove();
                     } else {//if geo and title2 are not  same, hide the question
                         // html+= "<option value='geographic'>Geographic</option>";
                         $("#select_column option[value='geographic']").remove();
                         document.getElementById("column_dropdown").style.display = '';
                         document.getElementById("select_column").style.display = '';
-                        document.getElementById("contents").style.display = '';
+                        document.getElementById("keyword").style.display = '';
                         $("#select_column").append(new Option("Geographic", "geographic"));
                         // $('#select_column').add("<option value='geographic'>Geographic</option>");
-                        $('#contents').html(html);
+                        //$('#contents').html(html);
+                        $('input#keyword').val(html);
                     }
                 };
                 
@@ -256,7 +258,7 @@ if ( isset($_POST["submit"]) ) {
         <div id="headerContainer">
             <div id="header1" style="padding: 20px;">
                 <h1 style="color: #ffffff">CSV Converter</h1>
-                <p style="text-align: center; margin-top: -15px; font-weight: bold;">Convret CSV to Islandora compatible CSV  File</p>
+                <p style="text-align: center; margin-top: -15px; font-weight: bold;">Convert CSV to Islandora compatible CSV File</p>
             </div>
         </div>
 
@@ -278,9 +280,10 @@ if ( isset($_POST["submit"]) ) {
                         </tr>
 
                         <tr id="column_dropdown">
-                            <td width="40%">Selet the column for this information</td>
+                            <td width="40%">Select the column for this information</td>
                             <tr>
-                            <td id="contents" style="color:red;"></td>
+                            <!--td id="contents" style="color:red;"></td-->
+                            <td><input type="text" id="keyword" name="keyword"></input></td>
                             <td>
                                 <select id="select_column" name="select_column">
                                     <option value="names">Names</option>
